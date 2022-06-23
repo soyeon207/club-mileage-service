@@ -13,7 +13,7 @@ create table review_point_histories
 (
     id              int auto_increment comment '기본키',
     review_point_id int         not null comment 'review_points FK',
-    point_case      varchar(20) not null comment '포인트 발생 원인',
+    point_cause      varchar(20) not null comment '포인트 발생 원인',
     amount          int         not null comment '포인트 값',
     constraint review_point_histories_pk primary key (id),
     constraint review_point_histories_review_points_id_fk foreign key (review_point_id) references review_points (id)
