@@ -8,4 +8,6 @@ public interface ReviewPointRepositoryCustom {
 
     List<ReviewPoints> findByReviewId(String reviewId);
 
+    List<ReviewPoints> findByUserId(String userId);
+
 }

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReviewPointRepository extends JpaRepository<ReviewPoints, Long>, ReviewPointRepositoryCustom {
 
+    boolean existsByUserId(String userId);
+
     boolean existsByUserIdAndPlaceId(String userId, String placeId);
 
     boolean existsByPlaceIdAndState(String placeId, ReviewPointState state);

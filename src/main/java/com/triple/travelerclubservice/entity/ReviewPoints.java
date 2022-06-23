@@ -60,6 +60,7 @@ public class ReviewPoints extends BaseTimeEntity{
 
     public void changeWithDraw(ReviewPointCause reviewPointCause) {
         this.state = ReviewPointState.WITHDRAW;
+        this.amount = 0;
         reviewPointHistoriesSet.add(ReviewPointHistories.ofCreate(this, reviewPointCause, this.getAmount() * -1));
     }
 

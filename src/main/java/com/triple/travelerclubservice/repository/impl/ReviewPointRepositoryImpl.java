@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import java.util.List;
 
 import static com.triple.travelerclubservice.entity.QReviewPoints.reviewPoints;
+import static com.triple.travelerclubservice.entity.QReviewPointHistories.reviewPointHistories;
 
 public class ReviewPointRepositoryImpl extends QuerydslRepositorySupport implements ReviewPointRepositoryCustom {
 
@@ -21,6 +22,14 @@ public class ReviewPointRepositoryImpl extends QuerydslRepositorySupport impleme
     public List<ReviewPoints> findByReviewId(String reviewId) {
         return from(reviewPoints)
                 .where(reviewPoints.reviewId.eq(reviewId))
+                .fetch();
+    }
+
+    @Override
+    public List<ReviewPoints> findByUserId(String userId) {
+        return from(reviewPoints)
+                .join(reviewPoints.reviewPointHistoriesSet, reviewPointHistories).fetchJoin()
+                .where(reviewPoints.userId.eq(userId))
                 .fetch();
     }
 
