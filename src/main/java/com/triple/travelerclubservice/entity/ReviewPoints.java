@@ -50,23 +50,29 @@ public class ReviewPoints extends BaseTimeEntity{
         instance.state = ReviewPointState.ACTIVE;
         instance.amount = reviewPointType.getScore();
         instance.reviewPointHistoriesSet.add(ReviewPointHistories
-                .builder()
-                .pointCause(reviewPointCause)
-                .amount(instance.getAmount())
-                .build());
+                        .builder()
+                        .pointCause(reviewPointCause)
+                        .amount(instance.getAmount())
+                        .reviewPoint(instance)
+                        .build());
         return instance;
     }
 
     public void changeState(ReviewPointState reviewPointState, ReviewPointCause reviewPointCause) {
         this.state = reviewPointState;
+        int changeAmount = this.getAmount() * -1;
         if (reviewPointState.equals(ReviewPointState.WITHDRAW)) {
             this.amount = 0;
+        } else {
+            this.amount = this.getType().getScore();
+            changeAmount = this.getAmount();
         }
+
         this.reviewPointHistoriesSet.add(ReviewPointHistories
                 .builder()
                 .reviewPoint(this)
                 .pointCause(reviewPointCause)
-                .amount(this.getAmount() * -1)
+                .amount(changeAmount)
                 .build());
     }
 

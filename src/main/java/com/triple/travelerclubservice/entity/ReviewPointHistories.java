@@ -1,14 +1,15 @@
 package com.triple.travelerclubservice.entity;
 
 import com.triple.travelerclubservice.enumeration.ReviewPointCause;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReviewPointHistories extends BaseTimeEntity {
 
     @Id

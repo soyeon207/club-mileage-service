@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ReviewPointRepositoryCustom {
 
-    List<ReviewPoints> findByReviewId(String reviewId);
+    List<ReviewPoints> findByReviewIdAndUserId(String reviewId, String userId);
 
     List<ReviewPoints> findByUserId(String userId);
 

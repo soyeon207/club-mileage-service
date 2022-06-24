@@ -19,9 +19,9 @@ public class ReviewPointRepositoryImpl extends QuerydslRepositorySupport impleme
     }
 
     @Override
-    public List<ReviewPoints> findByReviewId(String reviewId) {
+    public List<ReviewPoints> findByReviewIdAndUserId(String reviewId, String userId) {
         return from(reviewPoints)
-                .where(reviewPoints.reviewId.eq(reviewId))
+                .where(reviewPoints.userId.eq(userId).and(reviewPoints.reviewId.eq(reviewId)))
                 .fetch();
     }
 
@@ -30,6 +30,7 @@ public class ReviewPointRepositoryImpl extends QuerydslRepositorySupport impleme
         return from(reviewPoints)
                 .join(reviewPoints.reviewPointHistoriesSet, reviewPointHistories).fetchJoin()
                 .where(reviewPoints.userId.eq(userId))
+                .distinct()
                 .fetch();
     }
 
