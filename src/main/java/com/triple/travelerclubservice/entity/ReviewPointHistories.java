@@ -1,12 +1,14 @@
 package com.triple.travelerclubservice.entity;
 
 import com.triple.travelerclubservice.enumeration.ReviewPointCause;
+import lombok.Builder;
 import lombok.Getter;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@Builder
 public class ReviewPointHistories extends BaseTimeEntity {
 
     @Id
@@ -22,13 +24,5 @@ public class ReviewPointHistories extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private ReviewPoints reviewPoint;
-
-    public static ReviewPointHistories ofCreate(ReviewPoints reviewPoints, ReviewPointCause reviewPointCause, int amount) {
-        ReviewPointHistories instance = new ReviewPointHistories();
-        instance.pointCause = reviewPointCause;
-        instance.amount = amount;
-        instance.reviewPoint = reviewPoints;
-        return instance;
-    }
 
 }

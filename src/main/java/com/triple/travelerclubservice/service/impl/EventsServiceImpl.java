@@ -17,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,24 +31,20 @@ public class EventsServiceImpl implements EventsService {
 
     @Override
     public List<ReviewPointDto> createEvent(PointCreateRequest pointCreateRequest) {
-
         List<ReviewPoints> reviewPointsList = new ArrayList<>();
         switch (pointCreateRequest.getAction()) {
             case ADD:
                 // 리뷰 생성 이벤트
                 boolean isExistsReview = reviewPointRepository.existsByUserIdAndPlaceId(pointCreateRequest.getUserId(), pointCreateRequest.getPlaceId());
                 if (isExistsReview) throw new IllegalStateException("이미 해당 장소에 대해서 리뷰를 작성하셨습니다.");
+
                 if (isBonusCacheService.fetchBonusCache(pointCreateRequest.getPlaceId())) {
                     isBonusCacheService.putBonusCache(pointCreateRequest.getPlaceId(), false);
                     reviewPointsList.add(ReviewPoints.ofCreate(pointCreateRequest, ReviewPointType.BONUS, ReviewPointCause.BONUS));
                 }
 
-                if (pointCreateRequest.checkTextScore()) {
-                    reviewPointsList.add(ReviewPoints.ofCreate(pointCreateRequest, ReviewPointType.TEXT, ReviewPointCause.REVIEW_TEXT));
-                }
-
-                if (pointCreateRequest.checkImageScore()) {
-                    reviewPointsList.add(ReviewPoints.ofCreate(pointCreateRequest, ReviewPointType.IMAGE, ReviewPointCause.REVIEW_IMAGE));
+                for (Map.Entry<ReviewPointType, ReviewPointCause> reviewPointCauseEntry : pointCreateRequest.getReviewPointCauseMap().entrySet()) {
+                    reviewPointsList.add(ReviewPoints.ofCreate(pointCreateRequest, reviewPointCauseEntry.getKey(), reviewPointCauseEntry.getValue()));
                 }
 
                 reviewPointRepository.saveAll(reviewPointsList);
@@ -58,14 +55,12 @@ public class EventsServiceImpl implements EventsService {
                 if (CollectionUtils.isEmpty(reviewPointsList)) throw new IllegalStateException("작성하신 리뷰가 없습니다");
                 List<ReviewPoints> imageReviewPointList = reviewPointsList
                         .stream()
-                        .filter(reviewPoint -> reviewPoint.getType().equals(ReviewPointType.IMAGE))
+                        .filter(reviewPoint -> reviewPoint.getType().equals(ReviewPointType.IMAGE) && reviewPoint.getState().equals(ReviewPointState.ACTIVE))
                         .collect(Collectors.toList());
 
                 if (pointCreateRequest.checkImageScore() && CollectionUtils.isEmpty(imageReviewPointList)) {
                     reviewPointRepository.save(ReviewPoints.ofCreate(pointCreateRequest, ReviewPointType.IMAGE, ReviewPointCause.IMAGE_ADD));
-                }
-
-                if (!pointCreateRequest.checkImageScore() && !CollectionUtils.isEmpty(imageReviewPointList)) {
+                } else if (!pointCreateRequest.checkImageScore() && !CollectionUtils.isEmpty(imageReviewPointList)) {
                     for (ReviewPoints reviewPoints : imageReviewPointList) {
                         reviewPoints.changeState(ReviewPointState.WITHDRAW, ReviewPointCause.IMAGE_REMOVE);
                     }
@@ -76,7 +71,7 @@ public class EventsServiceImpl implements EventsService {
                 reviewPointsList = reviewPointRepository.findByReviewId(pointCreateRequest.getReviewId());
                 if (CollectionUtils.isEmpty(reviewPointsList)) throw new IllegalStateException("작성하신 리뷰가 없습니다");
                 for (ReviewPoints reviewPoints : reviewPointsList) {
-                    reviewPoints.changeWithDraw(ReviewPointCause.REVIEW_REMOVE);
+                    reviewPoints.changeState(ReviewPointState.WITHDRAW, ReviewPointCause.REVIEW_REMOVE);
                     if (reviewPoints.getType().equals(ReviewPointType.BONUS)) {
                         isBonusCacheService.putBonusCache(pointCreateRequest.getPlaceId(), true);
                     }
@@ -86,7 +81,10 @@ public class EventsServiceImpl implements EventsService {
                 throw new IllegalStateException("존재하지 않는 타입입니다.");
         }
 
-        return reviewPointsList.stream().map(reviewPointMapper::toDto).collect(Collectors.toList());
+        return reviewPointsList
+                .stream()
+                .map(reviewPointMapper::toDto)
+                .collect(Collectors.toList());
     }
 
 }

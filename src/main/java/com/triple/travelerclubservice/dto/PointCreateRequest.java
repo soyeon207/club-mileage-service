@@ -2,11 +2,16 @@ package com.triple.travelerclubservice.dto;
 
 import com.querydsl.core.util.StringUtils;
 import com.triple.travelerclubservice.enumeration.PointCreateAction;
+import com.triple.travelerclubservice.enumeration.ReviewPointCause;
+import com.triple.travelerclubservice.enumeration.ReviewPointType;
 import lombok.Getter;
 import org.springframework.util.CollectionUtils;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public class PointCreateRequest {
@@ -40,6 +45,13 @@ public class PointCreateRequest {
     public boolean checkImageScore() {
         // 내용 점수 중 `1점 이상 사진 첨부` 를 받을 수 있는지 확인 하는 메소드
         return !CollectionUtils.isEmpty(this.getAttachedPhotoIds());
+    }
+
+    public Map<ReviewPointType, ReviewPointCause> getReviewPointCauseMap() {
+        Map<ReviewPointType, ReviewPointCause> reviewPointCauseMap = new HashMap<>();
+        if (checkTextScore()) reviewPointCauseMap.put(ReviewPointType.TEXT, ReviewPointCause.REVIEW_TEXT);
+        if (checkImageScore()) reviewPointCauseMap.put(ReviewPointType.IMAGE, ReviewPointCause.REVIEW_IMAGE);
+        return reviewPointCauseMap;
     }
 
 }
