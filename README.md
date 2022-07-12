@@ -1,17 +1,17 @@
-# triple-club-mileage-service
+# club-mileage-service
 💰 클럽 마일리지 서비스 API
 
 ## 실행 방법
 ### ① repository clone 받기 
 ```
-git clone https://github.com/soyeon207/triple-club-mileage-service.git
-cd triple-club-mileage-service
+git clone https://github.com/soyeon207/club-mileage-service.git
+cd club-mileage-service
 ```
 
 ### ② docker-compose 실행<br>
 Docker Desktop 을 실행해주신 다음 루트 디렉토리에서 아래 명령어를 실행해주세요
 ```
-docker-compose -p triple up -d
+docker-compose -p club-mileage up -d
 ```
 
 ### ③ DB 생성<br>
@@ -21,7 +21,7 @@ User = soyeon<br>
 Password = 1234 로 mysql 에 접근 한 다음 아래 명령어를 실행해서 triple-db 를 만들어주세요.
 
 ```sql
-CREATE DATABASE `triple-db` 
+CREATE DATABASE `mileage-db` 
 DEFAULT CHARACTER SET utf8mb4 
 ```
 
